@@ -7,8 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 静态文件服务
+// 静态文件服务配置
 app.use(express.static('public'));
+
+// 根路由处理
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: 'public' });
+});
 
 // 验证环境变量是否存在
 if (!process.env.DEEPSEEK_API_KEY) {
