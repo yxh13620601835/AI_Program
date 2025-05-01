@@ -16,6 +16,10 @@
       "dest": "server/server.js"
     },
     {
+      "src": "/css/(.*)",
+      "headers": { "content-type": "text/css" }
+    },
+    {
       "handle": "filesystem"
     },
     {
