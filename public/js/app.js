@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     
     // 存储对话历史
-    let messageHistory = [];
+    const messageHistory = [];
 
     // 添加消息到聊天界面
     function addMessage(content, isUser = false) {
@@ -31,10 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = userInput.value.trim();
         if (!message) return;
 
+        // 显示用户消息并清空输入框
+        addMessage(message, true);
+        userInput.value = '';
+
         try {
-            // 显示用户消息并清空输入框
-            addMessage(message, true);
-            userInput.value = '';
             
             // 准备发送到API的消息历史
             const response = await fetch('/api/chat', {
