@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
+    
+    // 存储对话历史
+    let messageHistory = [];
 
     // 添加消息到聊天界面
     function addMessage(content, isUser = false) {
@@ -15,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.textContent = content;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // 添加消息到历史记录
+        messageHistory.push({
+            role: isUser ? 'user' : 'assistant',
+            content: content
+        });
     }
 
     // 发送消息到服务器
@@ -22,11 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = userInput.value.trim();
         if (!message) return;
 
-        // 显示用户消息
-        addMessage(message, true);
-        userInput.value = '';
-
         try {
+            // 显示用户消息并清空输入框
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // 准备发送到API的消息历史
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -34,10 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     model: 'deepseek-r1-250120',
-                    messages: [{
-                        role: 'user',
-                        content: message
-                    }],
+                    messages: messageHistory,
                     temperature: 0.7,
                     max_tokens: 2000,
                     stream: false
