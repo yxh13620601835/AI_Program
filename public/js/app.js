@@ -10,11 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(content, isUser = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        messageDiv.style.margin = '10px 0';
-        messageDiv.style.padding = '10px';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.backgroundColor = isUser ? '#e3f2fd' : '#f5f5f5';
-        messageDiv.style.alignSelf = isUser ? 'flex-end' : 'flex-start';
+
         messageDiv.textContent = content;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
