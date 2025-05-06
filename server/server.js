@@ -16,8 +16,8 @@ app.get('/', (req, res) => {
 });
 
 // 验证环境变量是否存在
-if (!process.env.DEEPSEEK_API_KEY) {
-  console.error('错误: 未找到DEEPSEEK_API_KEY环境变量');
+if (!process.env.DEEPSEEK_API_KEY || !process.env.DEEPSEEK_API_URL) {
+  console.error('错误: 未找到必要的环境变量');
   process.exit(1);
 }
 
