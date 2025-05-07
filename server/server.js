@@ -47,25 +47,44 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    // 打印请求体以便调试
+    console.log('发送到DeepSeek API的请求体:', JSON.stringify(req.body, null, 2));
+
     const response = await fetch(process.env.DEEPSEEK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
       },
       body: JSON.stringify(req.body)
     });
 
+    // 打印响应状态和头信息以便调试
+    console.log('DeepSeek API响应状态:', response.status);
+    console.log('DeepSeek API响应头:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData;
+      try {
+        const responseText = await response.text();
+        console.log('原始错误响应:', responseText);
+        errorData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('解析错误响应失败:', parseError);
+        errorData = {};
+      }
+
       console.error('API响应错误:', {
         status: response.status,
         statusText: response.statusText,
-        error: errorData
+        error: errorData,
+        url: process.env.DEEPSEEK_API_URL
       });
+
       return res.status(response.status).json({
         error: '请求处理失败',
-        message: errorData.error || '与AI服务通信时发生错误'
+        message: errorData.error || `API请求失败 (${response.status}: ${response.statusText})`
       });
     }
 
