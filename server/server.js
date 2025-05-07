@@ -23,10 +23,6 @@ const checkEnvVariables = () => {
   
   if (missingVars.length > 0) {
     console.warn(`警告: 以下环境变量未设置: ${missingVars.join(', ')}`);
-    if (process.env.NODE_ENV === 'production') {
-      console.error('生产环境必须设置所有环境变量！');
-      process.exit(1);
-    }
     return false;
   }
   return true;
@@ -38,12 +34,16 @@ const envValid = checkEnvVariables();
 // API路由
 app.post('/api/chat', async (req, res) => {
   try {
-    // 如果环境变量未设置，返回适当的错误响应
+    // 每次请求时重新检查环境变量
+    const envValid = checkEnvVariables();
     if (!envValid) {
-      console.error('API调用失败：环境变量未正确配置');
+      console.error('API调用失败：环境变量未正确配置', {
+        DEEPSEEK_API_KEY: !!process.env.DEEPSEEK_API_KEY,
+        DEEPSEEK_API_URL: !!process.env.DEEPSEEK_API_URL
+      });
       return res.status(503).json({
         error: '服务暂时不可用',
-        message: '系统配置不完整，请稍后再试'
+        message: '系统配置不完整，请检查环境变量设置'
       });
     }
 
