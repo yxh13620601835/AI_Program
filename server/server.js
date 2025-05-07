@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
-// 检查环境变量
+// 检查环境变量和URL格式
 const checkEnvVariables = () => {
   const missingVars = [];
   if (!process.env.DEEPSEEK_API_KEY) missingVars.push('DEEPSEEK_API_KEY');
@@ -23,6 +23,14 @@ const checkEnvVariables = () => {
   
   if (missingVars.length > 0) {
     console.warn(`警告: 以下环境变量未设置: ${missingVars.join(', ')}`);
+    return false;
+  }
+
+  // 验证API URL格式
+  try {
+    new URL(process.env.DEEPSEEK_API_URL);
+  } catch (error) {
+    console.error('API URL格式无效:', process.env.DEEPSEEK_API_URL);
     return false;
   }
   return true;
@@ -47,8 +55,14 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    // 验证API URL
+    if (!process.env.DEEPSEEK_API_URL.startsWith('http://') && !process.env.DEEPSEEK_API_URL.startsWith('https://')) {
+      throw new Error('API URL必须是完整的HTTP(S)地址');
+    }
+
     // 打印请求体以便调试
     console.log('发送到DeepSeek API的请求体:', JSON.stringify(req.body, null, 2));
+    console.log('使用的API URL:', process.env.DEEPSEEK_API_URL);
 
     const response = await fetch(process.env.DEEPSEEK_API_URL, {
       method: 'POST',
