@@ -26,8 +26,17 @@ const checkEnvVariables = () => {
     DEEPSEEK_API_URL: process.env.DEEPSEEK_API_URL
   };
 
+  console.log('----------------------------------------');
   console.log(`当前运行环境: ${isVercelEnvironment ? 'Vercel' : '本地开发'}`);
   console.log('环境变量检查开始...');
+  console.log('Node.js 版本:', process.version);
+  console.log('环境变量列表:');
+  Object.keys(process.env).forEach(key => {
+    if (key.startsWith('DEEPSEEK_')) {
+      console.log(`${key}: ${key === 'DEEPSEEK_API_KEY' ? '***' : process.env[key]}`);
+    }
+  });
+  console.log('----------------------------------------');
 
   // 检查环境变量是否存在
   Object.entries(envVars).forEach(([key, value]) => {

@@ -41,8 +41,12 @@
       "dest": "public/$1"
     }
   ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "node",
+  "outputDirectory": "public",
   "env": {
-    "DEEPSEEK_API_KEY": "${DEEPSEEK_API_KEY}",
-    "DEEPSEEK_API_URL": "${DEEPSEEK_API_URL}"
+    "DEEPSEEK_API_KEY": "@deepseek_api_key",
+    "DEEPSEEK_API_URL": "@deepseek_api_url"
   }
 }
