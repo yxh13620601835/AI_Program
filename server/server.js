@@ -27,6 +27,7 @@ const checkEnvVariables = () => {
   };
 
   console.log(`当前运行环境: ${isVercelEnvironment ? 'Vercel' : '本地开发'}`);
+  console.log('环境变量检查开始...');
 
   // 检查环境变量是否存在
   Object.entries(envVars).forEach(([key, value]) => {
@@ -34,7 +35,8 @@ const checkEnvVariables = () => {
       missingVars.push(key);
       console.error(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] 环境变量 ${key} 未设置或为空`);
     } else {
-      console.log(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] 环境变量 ${key} 已正确设置`);
+      const maskedValue = key === 'DEEPSEEK_API_KEY' ? '***' : value;
+      console.log(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] 环境变量 ${key} 已设置，值为: ${maskedValue}`);
     }
   });
 
@@ -49,27 +51,54 @@ const checkEnvVariables = () => {
   // 验证API URL格式和完整性
   try {
     const apiUrl = process.env.DEEPSEEK_API_URL;
+    console.log('正在验证API URL格式:', apiUrl);
+
+    // 检查URL是否为空或undefined
+    if (!apiUrl) {
+      console.error('API URL为空或未定义');
+      return {
+        valid: false,
+        error: 'API URL不能为空'
+      };
+    }
+
     // 检查URL是否以http或https开头
-    if (!apiUrl.match(/^https?:\/\/.+/)) {
+    const urlPattern = /^https?:\/\/.+/;
+    if (!urlPattern.test(apiUrl)) {
+      console.error('API URL格式验证失败: URL必须以http://或https://开头');
       return {
         valid: false,
         error: 'API URL必须以http://或https://开头'
       };
     }
+
     // 检查URL是否包含必要的API路径
     if (!apiUrl.includes('/chat') && !apiUrl.includes('/completions')) {
+      console.error('API URL格式验证失败: 缺少必要的API端点路径');
       return {
         valid: false,
         error: 'API URL必须包含有效的API端点路径（/chat或/completions）'
       };
     }
-    console.log('API URL格式验证通过:', apiUrl);
+
+    // 尝试解析URL
+    try {
+      new URL(apiUrl);
+    } catch (urlError) {
+      console.error('API URL解析失败:', urlError.message);
+      return {
+        valid: false,
+        error: 'API URL格式无效: ' + urlError.message
+      };
+    }
+
+    console.log('API URL格式验证通过');
     return { valid: true };
   } catch (error) {
-    console.error('API URL格式验证失败:', error.message);
+    console.error('API URL验证过程中发生错误:', error.message);
     return {
       valid: false,
-      error: 'API URL格式无效'
+      error: 'API URL验证失败: ' + error.message
     };
   }
 }
