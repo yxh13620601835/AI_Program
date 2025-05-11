@@ -15,43 +15,74 @@ app.get('/', (req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
+// 检查当前运行环境
+const isVercelEnvironment = process.env.VERCEL === '1';
+
 // 检查环境变量和URL格式
 const checkEnvVariables = () => {
   const missingVars = [];
-  if (!process.env.DEEPSEEK_API_KEY) missingVars.push('DEEPSEEK_API_KEY');
-  if (!process.env.DEEPSEEK_API_URL) missingVars.push('DEEPSEEK_API_URL');
-  
+  const envVars = {
+    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+    DEEPSEEK_API_URL: process.env.DEEPSEEK_API_URL
+  };
+
+  console.log(`当前运行环境: ${isVercelEnvironment ? 'Vercel' : '本地开发'}`);
+
+  // 检查环境变量是否存在
+  Object.entries(envVars).forEach(([key, value]) => {
+    if (!value || value.trim() === '') {
+      missingVars.push(key);
+      console.error(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] 环境变量 ${key} 未设置或为空`);
+    } else {
+      console.log(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] 环境变量 ${key} 已正确设置`);
+    }
+  });
+
   if (missingVars.length > 0) {
-    console.warn(`警告: 以下环境变量未设置: ${missingVars.join(', ')}`);
-    return false;
+    console.error(`错误: 以下环境变量未正确设置: ${missingVars.join(', ')}`);
+    return {
+      valid: false,
+      error: `缺少必要的环境变量: ${missingVars.join(', ')}`
+    };
   }
 
   // 验证API URL格式
   try {
-    new URL(process.env.DEEPSEEK_API_URL);
+    const url = new URL(process.env.DEEPSEEK_API_URL);
+    if (!url.protocol.startsWith('http')) {
+      return {
+        valid: false,
+        error: 'API URL必须使用HTTP或HTTPS协议'
+      };
+    }
+    console.log('API URL格式验证通过:', url.href);
+    return { valid: true };
   } catch (error) {
-    console.error('API URL格式无效:', process.env.DEEPSEEK_API_URL);
-    return false;
+    console.error('API URL格式验证失败:', error.message);
+    return {
+      valid: false,
+      error: 'API URL格式无效'
+    };
   }
-  return true;
 }
 
-// 环境变量检查
-const envValid = checkEnvVariables();
+// 初始环境变量检查
+const initialEnvCheck = checkEnvVariables();
+if (!initialEnvCheck.valid) {
+  console.error('服务器启动时环境变量检查失败:', initialEnvCheck.error);
+}
 
 // API路由
 app.post('/api/chat', async (req, res) => {
   try {
     // 每次请求时重新检查环境变量
-    const envValid = checkEnvVariables();
-    if (!envValid) {
-      console.error('API调用失败：环境变量未正确配置', {
-        DEEPSEEK_API_KEY: !!process.env.DEEPSEEK_API_KEY,
-        DEEPSEEK_API_URL: !!process.env.DEEPSEEK_API_URL
-      });
+    const envCheck = checkEnvVariables();
+    if (!envCheck.valid) {
+      console.error(`[${isVercelEnvironment ? 'Vercel' : 'Local'}] API调用失败：环境变量验证错误:`, envCheck.error);
       return res.status(503).json({
         error: '服务暂时不可用',
-        message: '系统配置不完整，请检查环境变量设置'
+        message: envCheck.error,
+        environment: isVercelEnvironment ? 'vercel' : 'local'
       });
     }
 
