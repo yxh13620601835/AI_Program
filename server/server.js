@@ -46,16 +46,24 @@ const checkEnvVariables = () => {
     };
   }
 
-  // 验证API URL格式
+  // 验证API URL格式和完整性
   try {
+    const apiUrl = process.env.DEEPSEEK_API_URL;
     // 检查URL是否以http或https开头
-    if (!process.env.DEEPSEEK_API_URL.match(/^https?:\/\/.+/)) {
+    if (!apiUrl.match(/^https?:\/\/.+/)) {
       return {
         valid: false,
         error: 'API URL必须以http://或https://开头'
       };
     }
-    console.log('API URL格式验证通过:', process.env.DEEPSEEK_API_URL);
+    // 检查URL是否包含必要的API路径
+    if (!apiUrl.includes('/chat') && !apiUrl.includes('/completions')) {
+      return {
+        valid: false,
+        error: 'API URL必须包含有效的API端点路径（/chat或/completions）'
+      };
+    }
+    console.log('API URL格式验证通过:', apiUrl);
     return { valid: true };
   } catch (error) {
     console.error('API URL格式验证失败:', error.message);
@@ -87,8 +95,12 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // 验证API URL
-    if (!process.env.DEEPSEEK_API_URL.match(/^https?:\/\/.+/)) {
+    const apiUrl = process.env.DEEPSEEK_API_URL;
+    if (!apiUrl.match(/^https?:\/\/.+/)) {
       throw new Error('API URL必须以http://或https://开头');
+    }
+    if (!apiUrl.includes('/chat') && !apiUrl.includes('/completions')) {
+      throw new Error('API URL必须包含有效的API端点路径（/chat或/completions）');
     }
 
     // 打印请求体以便调试
