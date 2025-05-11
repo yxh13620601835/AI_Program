@@ -48,14 +48,14 @@ const checkEnvVariables = () => {
 
   // 验证API URL格式
   try {
-    const url = new URL(process.env.DEEPSEEK_API_URL);
-    if (!url.protocol.startsWith('http')) {
+    // 检查URL是否以http或https开头
+    if (!process.env.DEEPSEEK_API_URL.match(/^https?:\/\/.+/)) {
       return {
         valid: false,
-        error: 'API URL必须使用HTTP或HTTPS协议'
+        error: 'API URL必须以http://或https://开头'
       };
     }
-    console.log('API URL格式验证通过:', url.href);
+    console.log('API URL格式验证通过:', process.env.DEEPSEEK_API_URL);
     return { valid: true };
   } catch (error) {
     console.error('API URL格式验证失败:', error.message);
@@ -87,8 +87,8 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // 验证API URL
-    if (!process.env.DEEPSEEK_API_URL.startsWith('http://') && !process.env.DEEPSEEK_API_URL.startsWith('https://')) {
-      throw new Error('API URL必须是完整的HTTP(S)地址');
+    if (!process.env.DEEPSEEK_API_URL.match(/^https?:\/\/.+/)) {
+      throw new Error('API URL必须以http://或https://开头');
     }
 
     // 打印请求体以便调试
