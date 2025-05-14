@@ -45,7 +45,7 @@
   "framework": "node",
   "outputDirectory": "public",
   "env": {
-    "DEEPSEEK_API_KEY": "@deepseek_api_key",
-    "DEEPSEEK_API_URL": "@deepseek_api_url"
+    "DEEPSEEK_API_KEY": "deepseek_api_key",
+    "DEEPSEEK_API_URL": "deepseek_api_url"
   }
 }
