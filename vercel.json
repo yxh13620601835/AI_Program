@@ -42,7 +42,6 @@
   ],
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": "node",
   "outputDirectory": "public",
   "env": {
     "DEEPSEEK_API_KEY": "${DEEPSEEK_API_KEY}",
