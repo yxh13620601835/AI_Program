@@ -81,12 +81,16 @@ const checkEnvVariables = () => {
       };
     }
 
-    // 检查URL是否包含必要的API路径
-    if (!apiUrl.includes('/chat') && !apiUrl.includes('/completions')) {
-      console.error('API URL格式验证失败: 缺少必要的API端点路径');
+    // 检查URL是否为有效的URL格式
+    console.log('API URL格式验证中...');
+    try {
+      new URL(apiUrl);
+      console.log('API URL格式有效');
+    } catch (urlError) {
+      console.error('API URL格式无效:', urlError.message);
       return {
         valid: false,
-        error: 'API URL必须包含有效的API端点路径（/chat或/completions）'
+        error: 'API URL格式无效: ' + urlError.message
       };
     }
 
@@ -132,14 +136,8 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // 验证API URL
+    // 记录API请求信息
     const apiUrl = process.env.DEEPSEEK_API_URL;
-    if (!apiUrl.match(/^https?:\/\/.+/)) {
-      throw new Error('API URL必须以http://或https://开头');
-    }
-    if (!apiUrl.includes('/chat') && !apiUrl.includes('/completions')) {
-      throw new Error('API URL必须包含有效的API端点路径（/chat或/completions）');
-    }
 
     // 打印请求体以便调试
     console.log('发送到DeepSeek API的请求体:', JSON.stringify(req.body, null, 2));

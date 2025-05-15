@@ -44,7 +44,7 @@
   "installCommand": "npm install",
   "outputDirectory": "public",
   "env": {
-    "DEEPSEEK_API_KEY": "${DEEPSEEK_API_KEY}",
-    "DEEPSEEK_API_URL": "${DEEPSEEK_API_URL}"
+    "DEEPSEEK_API_KEY": "@DEEPSEEK_API_KEY",
+    "DEEPSEEK_API_URL": "@DEEPSEEK_API_URL"
   }
 }
