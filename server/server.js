@@ -116,21 +116,18 @@ app.post('/api/chat', async (req, res) => {
 
     // 发送API请求
     console.log(`[${requestId}] 发送请求...`);
-    // 构建请求体，确保包含必要的model参数
-    const requestBody = {
-      model: "deepseek-r1-250120",  // 添加固定的model参数
-      ...req.body  // 保留其他请求参数
-    };
+    // 使用客户端传入的请求体
+    if (!isProduction) {
+      console.log(`[${requestId}] 客户端请求体:`, JSON.stringify(req.body, null, 2));
+    }
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-        'X-Request-ID': requestId
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(req.body)
     });
 
     // 打印响应状态和头信息以便调试

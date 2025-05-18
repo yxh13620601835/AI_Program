@@ -12,12 +12,42 @@
             <h1>Life Coach</h1>
         </header>
         <main>
+            <div class="top-panel">
+                <div class="mood-selector">
+                    <label>当前心情：</label>
+                    <select id="mood-select">
+                        <option value="happy">😊 开心</option>
+                        <option value="neutral" selected>😐 平静</option>
+                        <option value="sad">😢 难过</option>
+                        <option value="angry">😠 生气</option>
+                        <option value="excited">🤩 兴奨</option>
+                        <option value="worried">😟 担忧</option>
+                    </select>
+                </div>
+                <div class="conversation-analysis">
+                    <div class="analysis-item">
+                        <span class="analysis-label">整体情绪：</span>
+                        <span id="overall-mood">😐 平静</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">常见话题：</span>
+                        <span id="common-topics">暂无主题</span>
+                    </div>
+                    <div class="analysis-item">
+                        <span class="analysis-label">对话洞察：</span>
+                        <span id="conversation-insights">暂无对话</span>
+                    </div>
+                </div>
+            </div>
             <div class="chat-container">
                 <div id="chat-messages" class="chat-messages"></div>
+                    </select>
+                </div>
                 <div class="input-container">
                     <textarea id="user-input" placeholder="输入您的问题..."></textarea>
                     <button id="send-button">发送</button>
                 </div>
+
             </div>
         </main>
     </div>
